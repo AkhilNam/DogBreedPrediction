@@ -32,7 +32,7 @@ print("Breed names loaded successfully!")
 
 
 # Streamlit UI
-st.title("🐶 Pet Mood Detector")
+st.title("🐶 Dog Breed Detector")
 
 uploaded_file = st.file_uploader("Upload a Pet Image", type=["jpg", "png"])
 
