@@ -6,27 +6,19 @@ import os
 import json
 import requests
 # Load model
-# Hugging Face Model URL (Replace with your actual model link)
 MODEL_URL = "https://huggingface.co/AkhilNam/BreedDetector/resolve/main/fine_tuned_pet_mood_model.h5"
 MODEL_PATH = "fine_tuned_pet_mood_model.h5"
 
-# Check if model already exists, if not, download it
+# Download model if not exists
 if not os.path.exists(MODEL_PATH):
     print("Downloading model from Hugging Face...")
     response = requests.get(MODEL_URL, stream=True)
-    
-    # Ensure the request was successful
-    if response.status_code == 200:
-        with open(MODEL_PATH, "wb") as f:
-            for chunk in response.iter_content(chunk_size=1024):
-                if chunk:
-                    f.write(chunk)
-        print("Model download complete!")
-    else:
-        raise Exception(f"Failed to download model, HTTP Status Code: {response.status_code}")
+    with open(MODEL_PATH, "wb") as f:
+        for chunk in response.iter_content(chunk_size=1024):
+            if chunk:
+                f.write(chunk)
 
 # Load the model
-print("Loading model...")
 model = load_model(MODEL_PATH)
 print("Model loaded successfully!")
 
@@ -56,8 +48,27 @@ if uploaded_file:
 
     # Make prediction
     predictions = model.predict(img_array)
-    predicted_class = np.argmax(predictions, axis=1)[0]
-    predicted_breed = breed_mapping.get(predicted_class, "Unknown")
+
+    # Print raw model predictions (for debugging)
+    print("\n🔍 Raw Model Predictions:", predictions)
+
+    # Extract predicted class index
+    predicted_class = str(np.argmax(predictions, axis=1)[0])
+    print("📌 Predicted Class Index:", predicted_class)
+
+    # Verify breed mapping keys
+    print("📂 Breed Mapping Keys (First 10):", list(breed_mapping.keys())[:10])
+    print("📂 Breed Mapping Last 10 Keys:", list(breed_mapping.keys())[-10:])
+
+    # Debug: Check if predicted class is in breed mapping
+    if predicted_class in breed_mapping:
+        predicted_breed = breed_mapping[predicted_class].replace("_", " ").title()
+    else:
+        print(f"🚨 WARNING: Predicted class {predicted_class} not in breed_mapping!")
+        predicted_breed = "Unknown"
+
+    print("✅ Final Predicted Breed:", predicted_breed)
+
 
     # Display results
     st.image(img, caption=f"Predicted Breed: {predicted_breed}", use_column_width=True)
