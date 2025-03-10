@@ -6,19 +6,27 @@ import os
 import json
 import requests
 # Load model
+# Hugging Face Model URL (Replace with your actual model link)
 MODEL_URL = "https://huggingface.co/AkhilNam/BreedDetector/resolve/main/fine_tuned_pet_mood_model.h5"
 MODEL_PATH = "fine_tuned_pet_mood_model.h5"
 
-# Download model if not exists
+# Check if model already exists, if not, download it
 if not os.path.exists(MODEL_PATH):
     print("Downloading model from Hugging Face...")
     response = requests.get(MODEL_URL, stream=True)
-    with open(MODEL_PATH, "wb") as f:
-        for chunk in response.iter_content(chunk_size=1024):
-            if chunk:
-                f.write(chunk)
+    
+    # Ensure the request was successful
+    if response.status_code == 200:
+        with open(MODEL_PATH, "wb") as f:
+            for chunk in response.iter_content(chunk_size=1024):
+                if chunk:
+                    f.write(chunk)
+        print("Model download complete!")
+    else:
+        raise Exception(f"Failed to download model, HTTP Status Code: {response.status_code}")
 
 # Load the model
+print("Loading model...")
 model = load_model(MODEL_PATH)
 print("Model loaded successfully!")
 
