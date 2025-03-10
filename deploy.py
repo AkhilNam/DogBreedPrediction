@@ -4,13 +4,25 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import load_img, img_to_array
 import os
 import json
-
+import requests
 # Load model
-model_path = "fine_tuned_pet_mood_model.h5"  # Ensure this matches your saved model
-model = load_model(model_path)
+MODEL_URL = "https://huggingface.co/AkhilNam/BreedDetector/resolve/main/fine_tuned_pet_mood_model.h5"
+MODEL_PATH = "fine_tuned_pet_mood_model.h5"
 
+# Download model if not exists
+if not os.path.exists(MODEL_PATH):
+    print("Downloading model from Hugging Face...")
+    response = requests.get(MODEL_URL, stream=True)
+    with open(MODEL_PATH, "wb") as f:
+        for chunk in response.iter_content(chunk_size=1024):
+            if chunk:
+                f.write(chunk)
 
-# Load breed namesimport json
+# Load the model
+model = load_model(MODEL_PATH)
+print("Model loaded successfully!")
+
+# Load breed namesimport json   
 
 # Load breed names from JSON file
 with open("breed_names.json", "r") as f:
