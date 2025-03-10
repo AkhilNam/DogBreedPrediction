@@ -3,5 +3,7 @@ tensorflow
 numpy
 pillow
 requests
-os
-json
+h5py
+gdown
+matplotlib
+scipy
